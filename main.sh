@@ -37,6 +37,7 @@ function quit () {
     exit 0
 }
 
+# Проверяет размеры терминала
 function check_term () {
     MIN_COL=68
     MIN_LINE=30
@@ -157,23 +158,28 @@ function spawn_hole {
 	HOLE_Y=$((0 - RANDOM % 30))
 }
 
+# Размеры терминала
 TERM_COL=$(tput cols)
 TERM_LINE=$(tput lines)
 
+# Проверяем на соответствие
 check_term $TERM_COL $TERM_LINE
 
 trap quit INT TERM SIGINT SIGTERM EXIT
 trap '' SIGWINCH
 clear
 
+# Отключаем ввод и курсор
 stty -echo
 tput civis
 
+# Границы окна внутри рамки
 SCREEN_TOP=2
 SCREEN_BOTTOM=$(($TERM_LINE-2))
 SCREEN_LEFT=2
 SCREEN_RIGHT=$(($TERM_COL-1))
 
+# Отрисовка рамки
 for ((i=$SCREEN_LEFT; i<=$SCREEN_RIGHT; i++ )); do
 	printxy $i 1 "\e[2m═\e[0m"
 	printxy $i $(($TERM_LINE-1)) "\e[2m═\e[0m"
@@ -215,8 +221,11 @@ CAR_HEIGHT=${#car[@]}
 X=$LEFT_LANE_X
 Y=$(($SCREEN_BOTTOM -$CAR_HEIGHT))
 
-MY_SPEED=(12 10 8 6 4 2 2)
-ENEMY_SPEED=(40 32 24 16 8 4)
+# Массивы скоростей движения для разных уровней сложности
+# Чем больше индекс, тем выше сложность
+MY_SPEED=(12 10 8 6 4 4 3)
+ENEMY_SPEED=(40 32 24 16 10 8)
+
 TREE_TICK=0
 ENEMY_TICK=0
 
@@ -262,6 +271,9 @@ while true; do
 	fi
 	if [[ $SCORE -ge 20 ]]; then
 		DIFFICULTY=5
+	fi
+	if [[ $SCORE -ge 50 ]]; then
+		DIFFICULTY=6
 	fi
 
 	check_collision
